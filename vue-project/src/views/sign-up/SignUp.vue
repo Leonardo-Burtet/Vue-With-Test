@@ -16,7 +16,10 @@ const isDisabled = computed(() => {
   return (formState.password || formState.passwordRepeat) ? formState.password !== formState.passwordRepeat : true
 })
 
+const apiProgress = ref(false)
+
 const submit = () => {
+  apiProgress.value = true
   const {passwordRepeat, ...body} = formState
   axios.post('/api/v1/users', body )
   // fetch(window.location.origin + '/api/v1/users', {
@@ -31,27 +34,41 @@ const submit = () => {
 </script>
 
 <template>
-  <h1>Sign Up</h1>
+  <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+    <form class="card" @submit.prevent="submit">
+      <div class="card-header text-center">
+        <h1>Sign Up</h1>
+      </div>
   
-  <form @submit.prevent="submit">
-    <div>
-      <label for="username">Username</label>
-      <input v-model="formState.username" type="text" id="username" placeholder="Username">
-    </div>
-    
-    <div>
-      <label for="email">E-mail</label>
-      <input v-model="formState.email" type="text" id="email" placeholder="E-mail">
-    </div>
-
-    <div>
-      <label for="password">Password</label>
-      <input v-model="formState.password" type="password" id="password" placeholder="Password">
-    </div>
-    <div>
-      <label for="passwordRepeat">Password Repeat</label>
-      <input v-model="formState.passwordRepeat" type="password" id="passwordRepeat" placeholder="Password">
-    </div>
-    <button  :disabled="isDisabled">Sign Up</button>
-  </form>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label" for="username">Username</label>
+          <input class="form-control" v-model="formState.username" type="text" id="username" placeholder="Username">
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label" for="email">E-mail</label>
+          <input class="form-control" v-model="formState.email" type="text" id="email" placeholder="E-mail">
+        </div>
+  
+        <div class="mb-3">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-control" v-model="formState.password" type="password" id="password" placeholder="Password">
+        </div>
+  
+        <div class="mb-3">
+          <label class="form-label" for="passwordRepeat">Password Repeat</label>
+          <input class="form-control" v-model="formState.passwordRepeat" type="password" id="passwordRepeat" placeholder="Password">
+        </div>
+  
+        <div class="text-center">
+          <button class="btn btn-primary" :disabled="isDisabled || apiProgress">Sign Up</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </template>
+
+<style scoped>
+
+</style>
