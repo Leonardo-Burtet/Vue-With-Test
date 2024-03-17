@@ -37,7 +37,7 @@ const submit = async () => {
 
 <template>
   <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-    <form class="card" @submit.prevent="submit">
+    <form class="card" @submit.prevent="submit" data-testid="form-sign-up" v-if="!successMessage">
       <div class="card-header text-center">
         <h1>Sign Up</h1>
       </div>
@@ -71,7 +71,7 @@ const submit = async () => {
         </div>
       </div>
     </form>
-    <div v-if="successMessage" class="alert alert-success">
+    <div v-else="successMessage" class="alert alert-success">
       {{ successMessage }}
     </div>
   </div>
