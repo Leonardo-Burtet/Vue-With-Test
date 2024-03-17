@@ -17,11 +17,13 @@ const isDisabled = computed(() => {
 })
 
 const apiProgress = ref(false)
+const successMessage = ref()
 
-const submit = () => {
+const submit = async () => {
   apiProgress.value = true
   const {passwordRepeat, ...body} = formState
-  axios.post('/api/v1/users', body )
+  const response = await axios.post('/api/v1/users', body )
+  successMessage.value = response.data.message
   // fetch(window.location.origin + '/api/v1/users', {
   //   method: 'POST',
   //   headers: {
@@ -62,10 +64,16 @@ const submit = () => {
         </div>
   
         <div class="text-center">
-          <button class="btn btn-primary" :disabled="isDisabled || apiProgress">Sign Up</button>
+          <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
+            <span v-if="apiProgress" role="status" class="spinner-border spinner-border-sm"></span>
+            Sign Up
+          </button>
         </div>
       </div>
     </form>
+    <div v-if="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
   </div>
 </template>
 

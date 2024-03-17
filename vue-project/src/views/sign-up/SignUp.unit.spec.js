@@ -30,7 +30,8 @@ describe('SignUp', () => {
     describe('SignUp', () => {
         describe("when user submits form", () => {
             it('sends username, email, password to the backend', async () => {
-                const {user, elements: {button}} = await setup()
+              axios.post.mockResolvedValue({data: {}})  
+              const {user, elements: {button}} = await setup()
                 await user.click(button)
                 expect(axios.post).toHaveBeenCalledWith('/api/v1/users', {
                     username: 'user1',
@@ -39,5 +40,5 @@ describe('SignUp', () => {
                 })
             })
         })
-    })
+    }) 
 })

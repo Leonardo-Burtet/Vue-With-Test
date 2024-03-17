@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 // import axios from 'axios'
 import {setupServer} from 'msw/node'
 import { HttpResponse, http } from 'msw'
+import axios from 'axios'
 // vi.mock('axios')
 // const mockFetch = vi.fn();
 // global.fetch = mockFetch;
@@ -14,8 +15,9 @@ let counter = 0
 const server = setupServer(
   http.post('/api/v1/users', () => {
     counter += 1;
-    return HttpResponse.json({})
+    return HttpResponse.json({message: 'User create success'})
   })
+  
 )
 
 beforeEach(() => {
@@ -142,7 +144,27 @@ describe('SignUp', () => {
               expect(counter).toBe(1)
             })
       })
+
+      it('displays spinner', async () => {
+        const { user, elements: {button} } = await setup()
+        await user.click(button)
+        expect(screen.getByRole('status')).toBeInTheDocument()    
+      })
+
+      it('does not display spinner', () => {
+        render(SignUp)
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+      })
+
+      describe('when response status 200 ok', () => {
+        it('display messagem sucess', async () => {
+          const { user, elements: {button} } = await setup()
+          await user.click(button)
+          const text = await screen.findByText('User create success')
+          expect(text).toBeInTheDocument()
+        })
+      })
     })
   })
-})
+}) 
  
