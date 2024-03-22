@@ -18,19 +18,28 @@ const isDisabled = computed(() => {
 
 const apiProgress = ref(false)
 const successMessage = ref()
+const errorMessage = ref()
 
 const submit = async () => {
   apiProgress.value = true
+  errorMessage.value = undefined
   const {passwordRepeat, ...body} = formState
-  const response = await axios.post('/api/v1/users', body )
-  successMessage.value = response.data.message
-  // fetch(window.location.origin + '/api/v1/users', {
-  //   method: 'POST',
-  //   headers: {
-  //     "Content-Type": "application/json"
-  //   },
-  //   body: JSON.stringify(body)
-  // })
+  try {
+    const response = await axios.post('/api/v1/users', body )
+    successMessage.value = response.data.message
+    // fetch(window.location.origin + '/api/v1/users', {
+    //   method: 'POST',
+    //   headers: {
+    //     "Content-Type": "application/json"
+    //   },
+    //   body: JSON.stringify(body)
+    // })
+  } catch (error) {
+    errorMessage.value = "Unexpected error occurred, please try again"
+  } finally {
+    apiProgress.value = false
+  }
+  
 }
 
 </script>
@@ -62,7 +71,7 @@ const submit = async () => {
           <label class="form-label" for="passwordRepeat">Password Repeat</label>
           <input class="form-control" v-model="formState.passwordRepeat" type="password" id="passwordRepeat" placeholder="Password">
         </div>
-  
+        <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
             <span v-if="apiProgress" role="status" class="spinner-border spinner-border-sm"></span>

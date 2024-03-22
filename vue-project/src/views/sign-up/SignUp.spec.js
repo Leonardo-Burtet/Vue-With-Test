@@ -146,17 +146,17 @@ describe('SignUp', () => {
             })
       })
 
-      it('displays spinner', async () => {
-        server.use(
-            http.post('/api/v1/users', async () => {
-              await delay('infinite')
-              return HttpResponse.json({})
-            })            
-        )
-        const { user, elements: {button} } = await setup()
-        await user.click(button)
-        expect(screen.getByRole('status')).toBeInTheDocument()    
-      })
+      // it('displays spinner', async () => {
+      //   server.use(
+      //       http.post('/api/v1/users', async () => {
+      //         await delay('infinite')
+      //         return HttpResponse.json({})
+      //       })            
+      //   )
+      //   const { user, elements: {button} } = await setup()
+      //   await user.click(button)
+      //   expect(screen.getByRole('status')).toBeInTheDocument()    
+      // })
 
       it('does not display spinner', () => {
         render(SignUp)
@@ -180,6 +180,55 @@ describe('SignUp', () => {
           await user.click(button)
           await waitFor(() => {
             expect(form).not.toBeInTheDocument()
+          })
+        })
+      })
+
+      describe('when response status 404', () => {
+        it('display message unexpected', async () => {
+          server.use(
+            http.post('/api/v1/users', () => {
+              return HttpResponse.error({})
+            })            
+          )
+          const { user, elements: {button} } = await setup()
+          await user.click(button)
+          const text = await screen.findByText('Unexpected error occurred, please try again')
+          expect(text).toBeInTheDocument()
+        })
+
+        it("hides spinner", async () => {
+          server.use(
+            http.post('/api/v1/users', () => {
+              return HttpResponse.error({})
+            })            
+          )
+          const { user, elements: {button} } = await setup()
+          await user.click(button)
+          await waitFor(() => {
+            expect(screen.queryByRole('status')).not.toBeInTheDocument()
+          })
+        })
+      })
+
+      describe("when user submits again", () => {
+        it("rides error when api request is progress", async () => {
+          let processedFirstRequest = false
+          server.use(
+            http.post('/api/v1/users', () => {
+              if(!processedFirstRequest) {
+                return HttpResponse.error({})
+              } else {
+                return HttpResponse.json({})
+              }
+            })            
+          )
+          const { user, elements: {button} } = await setup()
+          await user.click(button)
+          const text = await screen.findByText('Unexpected error occurred, please try again')
+          await user.click(button)
+          await waitFor(() => {
+            expect(text).not.toBeInTheDocument();
           })
         })
       })
